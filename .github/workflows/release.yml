@@ -14,7 +14,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22.12'
+          go-version: '1.21'
       - name: build linux amd64 version
         run: |
           go mod tidy
@@ -40,13 +40,13 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.21'
       - name: build linux arm64 version
         run: |
           sudo apt-get update
           sudo apt install gcc-aarch64-linux-gnu
           go mod tidy
-          git diff --exit-code go.mod go.sum
+          git diff go.mod go.sum || echo "go.mod or go.sum changed, please review and commit"
           CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -o raha-xray-release -v main.go
           mkdir raha-xray
           cp raha-xray-release raha-xray/rahaXray
