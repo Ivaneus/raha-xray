@@ -156,7 +156,7 @@ reset_config() {
         config_json=$(<"$config_file")
     fi
 
-    local options=("listen" "domain" "port" "certFile" "keyFile" "basePath" "timeLocation" "dbType" "dbAddr")
+    local options=("listen" "domain" "port" "certFile" "keyFile" "basePath" "timeLocation" "dbType" "dbAddr" "dbName")
 
     # Display a menu for editing options
     while true; do
@@ -180,7 +180,8 @@ reset_config() {
             6) read -rp "Enter TimeLocation value: " timeLocation; config_json=$(echo "$config_json" | jq ".timeLocation=\"$timeLocation\"") ;;
             7) read -rp "Enter DbType value: " dbType; config_json=$(echo "$config_json" | jq ".dbType=\"$dbType\"") ;;
             8) read -rp "Enter DbAddr value: " dbAddr; config_json=$(echo "$config_json" | jq ".dbAddr=\"$dbAddr\"") ;;
-            9) break ;; # Exit
+            9) read -rp "Enter DbName value: " dbName; config_json=$(echo "$config_json" | jq ".dbAddr=\"$dbName\"") ;;
+            10) break ;; # Exit
             *) echo "Invalid option" ;;
         esac
     done
