@@ -1,7 +1,7 @@
 module raha-xray
 
-go 1.22.12
-toolchain go1.22.12
+go 1.21
+toolchain go1.22.9
 
 require (
 	github.com/gin-gonic/gin v1.10.0
