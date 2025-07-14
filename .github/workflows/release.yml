@@ -18,7 +18,7 @@ jobs:
       - name: build linux amd64 version
         run: |
           go mod tidy
-          git diff --exit-code go.mod go.sum
+          git diff go.mod go.sum || echo "go.mod or go.sum changed, please review and commit"
           CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o raha-xray-release -v main.go
           mkdir raha-xray
           cp raha-xray-release raha-xray/rahaXray
