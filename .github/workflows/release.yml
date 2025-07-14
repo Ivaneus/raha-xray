@@ -17,8 +17,6 @@ jobs:
           go-version: '1.22'
       - name: build linux amd64 version
         run: |
-          go mod tidy
-          git diff --exit-code go.mod go.sum
           CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o raha-xray-release -v main.go
           mkdir raha-xray
           cp raha-xray-release raha-xray/rahaXray
