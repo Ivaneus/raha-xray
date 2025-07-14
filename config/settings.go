@@ -25,6 +25,7 @@ type Setting struct {
 	TimeLocation string `json:"timeLocation" form:"timeLocation"`
 	DbType       string `json:"dbType" form:"dbType"`
 	DbAddr       string `json:"dbAddr" form:"dbAddr"`
+	DbName       string `json:"dbname" form:"dbname"`	
 	TrafficDays  int    `json:"trafficDays" form:"trafficDays"`
 }
 
@@ -38,6 +39,7 @@ var defaultSettings = Setting{
 	TimeLocation: "Asia/Tehran",
 	DbType:       "sqlite",
 	DbAddr:       "db",
+	DbName:       "raha-xray",	
 	TrafficDays:  0,
 }
 
@@ -88,7 +90,7 @@ func (s *Setting) GetTimeLocation() (*time.Location, error) {
 }
 
 func (s *Setting) GetDBPath() string {
-	return fmt.Sprintf("%s/%s.db", s.DbAddr, GetName())
+	return fmt.Sprintf("%s/%s.db", s.DbAddr, s.DbName)
 }
 
 func (s *Setting) GetMysqlDsn() string {
@@ -96,7 +98,7 @@ func (s *Setting) GetMysqlDsn() string {
 	if mysqlServer == "" {
 		mysqlServer = "root@"
 	}
-	return fmt.Sprintf("%s/%s?charset=utf8mb4&loc=Local", mysqlServer, GetName())
+	return fmt.Sprintf("%s/%s?charset=utf8mb4&loc=Local", mysqlServer, s.DbName)
 }
 
 func LoadSettings() error {
