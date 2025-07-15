@@ -1,50 +1,58 @@
-# Raha-Xray Software
+# Raha-Xray 软件
 
-This software is an API service provider that simplifies the necessary features for various uses of [xray-core](https://github.com/XTLS/Xray-core).
+Raha-Xray 软件是一个API服务提供者，简化了 [xray-core](https://github.com/XTLS/Xray-core) 的各种使用场景所需的功能。
 
-# How It Works
-To create a user capable of connecting to xray-core, the following steps must be followed:
-1. Add a config.
-2. Add an inbound with the config.id setting to use the added config.
-3. Add a client with the client_inbound setting to use the added inbound.
+# 工作原理
 
-## Special Features
-1. Create various services to work with xray-core.
-2. Connect users to multiple services simultaneously by creating users.
-3. User traffic is automatically managed, and different traffic/time restriction models can be applied.
-4. As an optional feature, inbound, outbound, and client traffic data can be obtained in a format suitable for chart design.
-5. Comprehensive server analysis reports can be obtained.
-6. For use on small servers with low usage, SQLite database can be used, while MySQL can be used for professional applications.
+要创建一个能够连接到 xray-core 的用户，必须按照以下步骤操作：
+1. 添加一个配置。
+2. 添加一个入站（inbound），并设置 config.id 以使用已添加的配置。
+3. 添加一个客户端（client），并设置 client_inbound 以使用已添加的入站。
 
-# Installation Method
-Refer to the [installation guide](https://github.com/Raha-Project/Raha/blob/main/README-FA.md#installation-methods).
+## 独特功能
 
-# Configuration
-The initial configuration of this software includes two files, which will be created with default data if they do not exist:
-1. The `raha-xray.json` file: Software settings are entered in this section.
-2. The `xrayDefault.json` file: Base xray-core settings that the software uses to apply changes.
+1. 创建多种服务以与 xray-core 协同工作。
+2. 通过创建用户，将其同时连接到多个服务。
+3. 用户流量自动管理，可应用不同的流量/时间限制模型。
+4. 作为可选功能，可获取入站、出站和客户端流量数据，格式适合用于图表设计。
+5. 可获取全面的服务器分析报告。
+6. 对于小型服务器或低使用量场景，可使用 SQLite 数据库；对于专业应用，可使用 MySQL。
 
-## Important Notes
-* These files will be created in the software's main directory (/usr/local/raha-xray/).
-* During installation or software updates, you will be prompted regarding changes to the `raha-xray.conf` file. You can also configure this file by using the `raha-xray` command in a text-based environment and selecting option 4.
-* These files can also be manually modified, but it is recommended to use automated methods.
-* These settings are also accessible for modification via the API.
+# 安装方法
 
-# Working with the API
-To use this API, you can utilize specialized tools or your own software. The software is accessible via a web service with the port and address specified in the settings.
-* It is recommended to ensure connection security by providing SSL in the settings.
+请参阅 [安装指南](https://github.com/Raha-Project/Raha/blob/main/README-FA.md#installation-methods)。
 
-## Security and Authentication
-To send requests to this API, you must obtain a token using the `raha-xray` command in a Linux text-based environment with options 5–8.
-> A default token is always created during installation, which you can use.
+# 配置
 
-This token must be included in the HTTP Header of all your requests under the name `X-Token`.
+该软件的初始配置包括两个文件，如果文件不存在，将以默认数据创建：
+1. `raha-xray.json` 文件：软件设置在此部分输入。
+2. `xrayDefault.json` 文件：xray-core 的基础设置，软件用其应用更改。
 
-## Method Descriptions
-This section first explains the main paths and their purposes:
+## 重要说明
+
+* 这些文件将在软件主目录（/usr/local/raha-xray/）中创建。
+* 在安装或软件更新期间，系统会询问有关 `raha-xray.conf` 文件更改的问题。您也可以通过在文本环境中使用 `raha-xray` 命令并选择选项 4 来配置此文件。
+* 这些文件也可以手动修改，但建议使用自动化方法。
+* 这些设置也可以通过 API 进行修改。
+
+# 使用 API
+
+要使用此 API，可以使用专用工具或您自己的软件。该软件通过设置中指定的端口和地址，通过 Web 服务访问。
+* 建议在设置中提供 SSL 以确保连接安全。
+
+## 安全与认证
+
+要向此 API 发送请求，必须通过在 Linux 文本环境中使用 `raha-xray` 命令并选择选项 5-8 来获取令牌。
+> 安装时始终会创建一个默认令牌，您可以使用该令牌。
+
+所有请求的 HTTP 头部中必须包含此令牌，名称为 `X-Token`。
+
+## 方法描述
+
+本节首先解释主要路径及其用途：
 
 Base path: /api
-> The base path can be modified in the `raha-xray.conf` configuration file.
+> 基础路径可在 `raha-xray.conf` 配置文件中修改。
 
 | Path          | Purpose                                           | xray-core API |
 |---------------|--------------------------------------------------|---------------|
@@ -56,14 +64,14 @@ Base path: /api
 | `/server`     | Server information                               |               |
 | `/settings`   | Settings                                         |               |
 
-* Changes applied to paths that interact with xray-core via the API will take effect without restarting xray-core, thus avoiding disconnection of all users.
+* 对通过 API 与 xray-core 交互的路径应用更改时，无需重启 xray-core，因此不会断开所有用户的连接。
 
-### Configs Path Methods Guide
+### Configs 路径方法指南
 
 <details>
-  <summary>Click to view description</summary>
+  <summary>点击查看描述</summary>
 
-Defined model:
+定义的模型：
 ```go
 type Config struct {
     Id             uint     `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
@@ -74,7 +82,7 @@ type Config struct {
     ClientSettings string   `json:"clientSettings" form:"clientSettings"`
 }
 ```
-**API methods:**
+**API 方法：**
 Base: /api/configs
 
 | Method | Path                            | Action                                    | Request Body |
@@ -84,7 +92,7 @@ Base: /api/configs
 | `POST` | `"/save"`                       | Add/Edit a config                         | [JSON](#description-apiconfigssave)     |
 | `POST` | `"/del/:id"`                    | Delete a config                           | -            |
 
-##### Sample JSON for sending to /save:
+##### /api/configs/save 的样本 JSON：
 ```json
 {
     "id": 1,
@@ -95,7 +103,7 @@ Base: /api/configs
     "clientSettings": ""
 }
 ```
-##### Description of /api/configs/save
+##### /api/configs/save 描述
 | Parameter         | Type   | Required | Description                                      |
 |-------------------|--------|----------|--------------------------------------------------|
 | `id`              | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
@@ -106,11 +114,11 @@ Base: /api/configs
 
 </details>
 
-### Inbounds Path Methods Guide
+### Inbounds 路径方法指南
 <details>
-  <summary>Click to view description</summary>
+  <summary>点击查看描述</summary>
 
-Defined model:
+定义的模型：
 ```go
 type Inbound struct {
     Id     uint   `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
@@ -128,7 +136,7 @@ type Inbound struct {
     ClientInbounds []ClientInbound `gorm:"foreignKey:InboundId;references:Id" json:"clients"`
 }
 ```
-**API methods:**
+**API 方法：**
 Base: /api/inbounds
 
 | Method | Path                            | Action                                    | Request Body |
@@ -139,7 +147,7 @@ Base: /api/inbounds
 | `POST` | `"/del/:id"`                    | Delete an inbound                         | -            |
 | `GET`  | `"/traffics/:tag"`              | Get an inbound's traffics (if enabled)    | -            |
 
-##### Sample JSON for sending to /save:
+##### /api/inbounds/save 的样本 JSON：
 ```json
 {
     "id": 2,
@@ -151,7 +159,7 @@ Base: /api/inbounds
     "tag": "in-2"
 }
 ```
-##### Description of /api/inbounds/save
+##### /api/inbounds/save 描述
 | Parameter  | Type   | Required | Description                                      |
 |------------|--------|----------|--------------------------------------------------|
 | `id`       | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
@@ -162,15 +170,15 @@ Base: /api/inbounds
 | `configId` | uint   | Yes      | ID of the config used                           |
 | `tag`      | string | Yes      | Inbound tag (must be unique)                    |
 
-* When retrieving an inbound, the associated clients will also be listed. [ClientInbound model](#client_inbounds-model). Config information is also visible.
+* 检索入站时，关联的客户端也将列出。[ClientInbound 模型](#client_inbounds-model)。配置信息也可见。
 
 </details>
 
-### Clients Path Methods Guide
+### Clients 路径方法指南
 <details>
-  <summary>Click to view description</summary>
+  <summary>点击查看描述</summary>
 
-Defined model:
+定义的模型：
 ```go
 type Client struct {
     Id     uint   `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
@@ -188,7 +196,7 @@ type Client struct {
     ClientInbounds []ClientInbound `gorm:"foreignKey:ClientId;references:Id" json:"inbounds"`
 }
 ```
-**API methods:**
+**API 方法：**
 Base: /api/clients
 
 | Method | Path                            | Action                                    | Request Body |
@@ -202,7 +210,7 @@ Base: /api/clients
 | `POST` | `"/onlines"`                    | Get the list of last online users         | -            |
 | `GET`  | `"/traffics/:tag"`              | Get traffics (if enabled)                | -            |
 
-##### Sample JSON for sending to /add:
+##### /api/clients/add 的样本 JSON：
 ```json
 [
     {
@@ -245,7 +253,7 @@ Base: /api/clients
     }
 ]
 ```
-##### Description of /api/clients/add
+##### /api/clients/add 描述
 | Parameter  | Type   | Required | Description                                      |
 |------------|--------|----------|--------------------------------------------------|
 | `name`     | string | Yes      | User name (must be unique)                       |
@@ -259,11 +267,11 @@ Base: /api/clients
 | `remark`   | string | No       | Alias used in links                             |
 | `inbounds` | client_inbounds | No | Usable inbounds for the user                     |
 
-##### Sample JSON for sending to /update:
+##### /api/clients/update 的样本 JSON：
 
-For updating a user, not all fields need to be sent (version 0.0.2 and above).
+更新用户时，无需发送所有字段（版本 0.0.2 及以上）。
 
-* Sample with all fields:
+* 包含所有字段的样本：
 ```json
 {
     "id": 1,
@@ -278,7 +286,7 @@ For updating a user, not all fields need to be sent (version 0.0.2 and above).
     "remark": "theFirstTest"
 }
 ```
-* Sample for resetting user traffic:
+* 重置用户流量的样本：
 ```json
 {
     "id": 1,
@@ -286,7 +294,7 @@ For updating a user, not all fields need to be sent (version 0.0.2 and above).
     "down": 0
 }
 ```
-* Sample for disabling a user:
+* 禁用用户的样本：
 ```json
 {
     "id": 1,
@@ -294,7 +302,7 @@ For updating a user, not all fields need to be sent (version 0.0.2 and above).
 }
 ```
 
-##### Description of /api/clients/update
+##### /api/clients/update 描述
 | Parameter  | Type   | Required | Description                                      |
 |------------|--------|----------|--------------------------------------------------|
 | `id`       | uint   | Yes      | Unique ID of the user to be edited               |
@@ -308,7 +316,7 @@ For updating a user, not all fields need to be sent (version 0.0.2 and above).
 | `down`     | uint64 | No       | User's download data in bytes                    |
 | `remark`   | string | No       | Alias used in links                             |
 
-##### Sample JSON for sending to /inbounds:
+##### /api/clients/inbounds 的样本 JSON：
 ```json
 [
     {
@@ -319,7 +327,7 @@ For updating a user, not all fields need to be sent (version 0.0.2 and above).
 ]
 ```
 
-##### Description of /api/clients/inbounds
+##### /api/clients/inbounds 描述
 | Parameter   | Type   | Required | Description                                      |
 |-------------|--------|----------|--------------------------------------------------|
 | `id`        | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
@@ -328,9 +336,9 @@ For updating a user, not all fields need to be sent (version 0.0.2 and above).
 
 </details>
 
-### ClientInbounds Model
+### ClientInbounds 模型
 <details>
-  <summary>Click to view description</summary>
+  <summary>点击查看描述</summary>
 
 ```go
 type ClientInbound struct {
@@ -340,7 +348,7 @@ type ClientInbound struct {
     Config    string `json:"config" form:"config"`
 }
 ```
-##### Sample JSON received in inbounds and clients:
+##### inbounds 和 clients 接收的样本 JSON：
 ```json
 [
     {
@@ -353,11 +361,11 @@ type ClientInbound struct {
 ```
 </details>
 
-### Outbounds Path Methods Guide
+### Outbounds 路径方法指南
 <details>
-  <summary>Click to view description</summary>
+  <summary>点击查看描述</summary>
 
-Defined model:
+定义的模型：
 ```go
 type Outbound struct {
     Id             uint   `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
@@ -370,7 +378,7 @@ type Outbound struct {
     Mux            string `json:"mux" form:"mux"`
 }
 ```
-**API methods:**
+**API 方法：**
 Base: /api/outbounds
 
 | Method | Path                            | Action                                    | Request Body |
@@ -381,7 +389,7 @@ Base: /api/outbounds
 | `POST` | `"/del/:id"`                    | Delete an outbound                        | -            |
 | `GET`  | `"/traffics/:tag"`              | Get an outbound's traffics (if enabled)   | -            |
 
-##### Sample JSON for sending to /save:
+##### /api/outbounds/save 的样本 JSON：
 ```json
 {
     "id": 1,
@@ -394,7 +402,7 @@ Base: /api/outbounds
     "mux": ""
 }
 ```
-##### Description of /api/outbounds/save
+##### /api/outbounds/save 描述
 | Parameter       | Type   | Required | Description                                      |
 |-----------------|--------|----------|--------------------------------------------------|
 | `id`            | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
@@ -406,15 +414,15 @@ Base: /api/outbounds
 | `proxySettings` | string | No       | Forward outbound to another outbound with tag    |
 | `mux`           | string | No       | Multiplexing settings                           |
 
-[More details](https://xtls.github.io/en/config/outbound.html)
+[更多详情](https://xtls.github.io/en/config/outbound.html)
 
 </details>
 
-### Rules Path Methods Guide
+### Rules 路径方法指南
 <details>
-  <summary>Click to view description</summary>
+  <summary>点击查看描述</summary>
 
-Defined model:
+定义的模型：
 ```go
 type Rule struct {
     Id            uint   `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
@@ -434,7 +442,7 @@ type Rule struct {
     BalancerTag   string `json:"balancerTag" form:"balancerTag"`
 }
 ```
-**API methods:**
+**API 方法：**
 Base: /api/rules
 
 | Method | Path                            | Action                                    | Request Body |
@@ -444,7 +452,7 @@ Base: /api/rules
 | `POST` | `"/save"`                       | Add/Edit a rule                           | [JSON](#description-apirulessave) |
 | `POST` | `"/del/:id"`                    | Delete a rule                             | -            |
 
-##### Sample JSON for sending to /save:
+##### /api/rules/save 的样本 JSON：
 ```json
 {
     "id": 1,
@@ -464,7 +472,7 @@ Base: /api/rules
     "balancerTag": "balancer"
 }
 ```
-##### Description of /api/rules/save
+##### /api/rules/save 描述
 | Parameter       | Type   | Required | Description                                      |
 |-----------------|--------|----------|--------------------------------------------------|
 | `id`            | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
@@ -482,17 +490,17 @@ Base: /api/rules
 | `outboundTag`   | string | Yes      | Outbound tag                                    |
 | `balancerTag`   | string | No       | LoadBalancer tag                                |
 
-[More details](https://xtls.github.io/en/config/routing.html#ruleobject)
+[更多详情](https://xtls.github.io/en/config/routing.html#ruleobject)
 
 </details>
 
-### Server Path Methods Guide
+### Server 路径方法指南
 <details>
-  <summary>Click to view description</summary>
+  <summary>点击查看描述</summary>
 
-This method is used to retrieve and send server information.
+此方法用于检索和发送服务器信息。
 
-**API methods:**
+**API 方法：**
 Base: /api/server
 
 | Method | Path                            | Action                                    | Request Body |
@@ -506,7 +514,7 @@ Base: /api/server
 | `POST` | `"/logs/:app/:count"`           | Get logs of services                      | -            |
 | `POST` | `"/getNewX25519Cert"`           | Get reality keys                          | -            |
 
-##### Sample JSON received from /status:
+##### /status 接收的样本 JSON：
 ```json
 {
     "cpu": 2.676659528908924,
@@ -569,13 +577,13 @@ Base: /api/server
 
 </details>
 
-### Settings Path Methods Guide
+### Settings 路径方法指南
 <details>
-  <summary>Click to view description</summary>
+  <summary>点击查看描述</summary>
 
-This method is used to retrieve and send software settings.
+此方法用于检索和发送软件设置。
 
-**API methods:**
+**API 方法：**
 Base: /api/settings
 
 | Method | Path                            | Action                                    | Request Body |
@@ -586,7 +594,7 @@ Base: /api/settings
 | `POST` | `"/setSettings"`                | Update App Configuration                  | [JSON](#description-apisettingssetsettings) |
 | `POST` | `"/restartApp"`                 | Restart Raha-Xray                         | -            |
 
-##### Sample JSON for sending to /setXrayDefault:
+##### /setXrayDefault 的样本 JSON：
 ```json
 {
   "log": {
@@ -658,7 +666,7 @@ Base: /api/settings
 }
 ```
 
-##### Sample JSON for sending to /setSettings:
+##### /setSettings 的样本 JSON：
 ```json
 {
     "listen": "",
@@ -673,7 +681,7 @@ Base: /api/settings
     "trafficDays": 30
 }
 ```
-##### Description of /api/settings/setSettings
+##### /api/settings/setSettings 描述
 | Parameter       | Type   | Required | Description                                      |
 |-----------------|--------|----------|--------------------------------------------------|
 | `listen`        | string | Yes      | IP address for the API service                   |
