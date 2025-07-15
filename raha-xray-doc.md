@@ -1,105 +1,70 @@
-Raha-Xray Software
-This software is an API service provider that simplifies the necessary features for various uses of xray-core.
-How It Works
+# Raha-Xray Software
+
+This software is an API service provider that simplifies the necessary features for various uses of [xray-core](https://github.com/XTLS/Xray-core).
+
+# How It Works
 To create a user capable of connecting to xray-core, the following steps must be followed:
+1. Add a config.
+2. Add an inbound with the config.id setting to use the added config.
+3. Add a client with the client_inbound setting to use the added inbound.
 
-Add a config.
-Add an inbound with the config.id setting to use the added config.
-Add a client with the client_inbound setting to use the added inbound.
+## Special Features
+1. Create various services to work with xray-core.
+2. Connect users to multiple services simultaneously by creating users.
+3. User traffic is automatically managed, and different traffic/time restriction models can be applied.
+4. As an optional feature, inbound, outbound, and client traffic data can be obtained in a format suitable for chart design.
+5. Comprehensive server analysis reports can be obtained.
+6. For use on small servers with low usage, SQLite database can be used, while MySQL can be used for professional applications.
 
-Special Features
+# Installation Method
+Refer to the [installation guide](https://github.com/Raha-Project/Raha/blob/main/README-FA.md#installation-methods).
 
-Create various services to work with xray-core.
-Connect users to multiple services simultaneously by creating users.
-User traffic is automatically managed, and different traffic/time restriction models can be applied.
-As an optional feature, inbound, outbound, and client traffic data can be obtained in a format suitable for chart design.
-Comprehensive server analysis reports can be obtained.
-For use on small servers with low usage, SQLite database can be used, while MySQL can be used for professional applications.
-
-Installation Method
-Refer to the installation guide.
-Configuration
+# Configuration
 The initial configuration of this software includes two files, which will be created with default data if they do not exist:
+1. The `raha-xray.json` file: Software settings are entered in this section.
+2. The `xrayDefault.json` file: Base xray-core settings that the software uses to apply changes.
 
-The raha-xray.json file: Software settings are entered in this section.
-The xrayDefault.json file: Base xray-core settings that the software uses to apply changes.
+## Important Notes
+* These files will be created in the software's main directory (/usr/local/raha-xray/).
+* During installation or software updates, you will be prompted regarding changes to the `raha-xray.conf` file. You can also configure this file by using the `raha-xray` command in a text-based environment and selecting option 4.
+* These files can also be manually modified, but it is recommended to use automated methods.
+* These settings are also accessible for modification via the API.
 
-Important Notes
-
-These files will be created in the software's main directory (/usr/local/raha-xray/).
-During installation or software updates, you will be prompted regarding changes to the raha-xray.conf file. You can also configure this file by using the raha-xray command in a text-based environment and selecting option 4.
-These files can also be manually modified, but it is recommended to use automated methods.
-These settings are also accessible for modification via the API.
-
-Working with the API
+# Working with the API
 To use this API, you can utilize specialized tools or your own software. The software is accessible via a web service with the port and address specified in the settings.
+* It is recommended to ensure connection security by providing SSL in the settings.
 
-It is recommended to ensure connection security by providing SSL in the settings.
+## Security and Authentication
+To send requests to this API, you must obtain a token using the `raha-xray` command in a Linux text-based environment with options 5–8.
+> A default token is always created during installation, which you can use.
 
-Security and Authentication
-To send requests to this API, you must obtain a token using the raha-xray command in a Linux text-based environment with options 5–8.
+This token must be included in the HTTP Header of all your requests under the name `X-Token`.
 
-A default token is always created during installation, which you can use.
-
-This token must be included in the HTTP Header of all your requests under the name X-Token.
-Method Descriptions
+## Method Descriptions
 This section first explains the main paths and their purposes:
+
 Base path: /api
+> The base path can be modified in the `raha-xray.conf` configuration file.
 
-The base path can be modified in the raha-xray.conf configuration file.
+| Path          | Purpose                                           | xray-core API |
+|---------------|--------------------------------------------------|---------------|
+| `/configs`    | Different service models for use in inbounds      | ✅            |
+| `/inbounds`   | Inbounds                                         | ✅            |
+| `/clients`    | Users                                            | ✅            |
+| `/outbounds`  | Outbounds                                        | ✅            |
+| `/rules`      | Routing rules                                    |               |
+| `/server`     | Server information                               |               |
+| `/settings`   | Settings                                         |               |
 
+* Changes applied to paths that interact with xray-core via the API will take effect without restarting xray-core, thus avoiding disconnection of all users.
 
+### Configs Path Methods Guide
 
-
-Path
-Purpose
-xray-core API
-
-
-
-/configs
-Different service models for use in inbounds
-✅
-
-
-/inbounds
-Inbounds
-✅
-
-
-/clients
-Users
-✅
-
-
-/outbounds
-Outbounds
-✅
-
-
-/rules
-Routing rules
-
-
-
-/server
-Server information
-
-
-
-/settings
-Settings
-
-
-
-
-Changes applied to paths that interact with xray-core via the API will take effect without restarting xray-core, thus avoiding disconnection of all users.
-
-Configs Path Methods Guide
-
-  Click to view description
+<details>
+  <summary>Click to view description</summary>
 
 Defined model:
+```go
 type Config struct {
     Id             uint     `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
     Protocol       Protocol `json:"protocol" form:"protocol"`
@@ -108,43 +73,19 @@ type Config struct {
     Sniffing       string   `json:"sniffing" form:"sniffing"`
     ClientSettings string   `json:"clientSettings" form:"clientSettings"`
 }
+```
+**API methods:**
+Base: /api/configs
 
-API methods:Base: /api/configs
+| Method | Path                            | Action                                    | Request Body |
+|--------|---------------------------------|-------------------------------------------|--------------|
+| `GET`  | `"/"`                           | Get all configs                           | -            |
+| `GET`  | `"/get/:id"`                    | Get a config with config.id               | -            |
+| `POST` | `"/save"`                       | Add/Edit a config                         | [JSON](#description-apiconfigssave)     |
+| `POST` | `"/del/:id"`                    | Delete a config                           | -            |
 
-
-
-Method
-Path
-Action
-Request Body
-
-
-
-GET
-"/"
-Get all configs
--
-
-
-GET
-"/get/:id"
-Get a config with config.id
--
-
-
-POST
-"/save"
-Add/Edit a config
-JSON
-
-
-POST
-"/del/:id"
-Delete a config
--
-
-
-Sample JSON for sending to /save:
+##### Sample JSON for sending to /save:
+```json
 {
     "id": 1,
     "protocol": "vless",
@@ -153,55 +94,24 @@ Sample JSON for sending to /save:
     "sniffing": "{\"destOverride\": [\"http\",\"tls\",\"quic\"],\"enabled\": true}",
     "clientSettings": ""
 }
+```
+##### Description of /api/configs/save
+| Parameter         | Type   | Required | Description                                      |
+|-------------------|--------|----------|--------------------------------------------------|
+| `id`              | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
+| `protocol`        | string | Yes      | Inbound protocol                                 |
+| `settings`        | string | Yes      | Protocol settings, excluding the users section   |
+| `streamSettings`  | string | Yes      | [Stream settings](https://xtls.github.io/en/config/transport.html#streamsettingsobject) |
+| `clientSettings`  | string | No       | Settings required for user links                 |
 
-Description of /api/configs/save
+</details>
 
-
-
-Parameter
-Type
-Required
-Description
-
-
-
-id
-uint
-No
-If not provided, a new record is created; if provided, the specified record is edited
-
-
-protocol
-string
-Yes
-Inbound protocol
-
-
-settings
-string
-Yes
-Protocol settings, excluding the users section
-
-
-streamSettings
-string
-Yes
-Stream settings
-
-
-clientSettings
-string
-No
-Settings required for user links
-
-
-
-
-Inbounds Path Methods Guide
-
-  Click to view description
+### Inbounds Path Methods Guide
+<details>
+  <summary>Click to view description</summary>
 
 Defined model:
+```go
 type Inbound struct {
     Id     uint   `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
     Name   string `json:"name" form:"name"`
@@ -217,49 +127,20 @@ type Inbound struct {
     // clients part
     ClientInbounds []ClientInbound `gorm:"foreignKey:InboundId;references:Id" json:"clients"`
 }
+```
+**API methods:**
+Base: /api/inbounds
 
-API methods:Base: /api/inbounds
+| Method | Path                            | Action                                    | Request Body |
+|--------|---------------------------------|-------------------------------------------|--------------|
+| `GET`  | `"/"`                           | Get all inbounds                          | -            |
+| `GET`  | `"/get/:id"`                    | Get an inbound with inbound.id            | -            |
+| `POST` | `"/save"`                       | Add/Edit an inbound                       | [JSON](#description-apiinboundssave)     |
+| `POST` | `"/del/:id"`                    | Delete an inbound                         | -            |
+| `GET`  | `"/traffics/:tag"`              | Get an inbound's traffics (if enabled)    | -            |
 
-
-
-Method
-Path
-Action
-Request Body
-
-
-
-GET
-"/"
-Get all inbounds
--
-
-
-GET
-"/get/:id"
-Get an inbound with inbound.id
--
-
-
-POST
-"/save"
-Add/Edit an inbound
-JSON
-
-
-POST
-"/del/:id"
-Delete an inbound
--
-
-
-GET
-"/traffics/:tag"
-Get an inbound's traffics (if enabled)
--
-
-
-Sample JSON for sending to /save:
+##### Sample JSON for sending to /save:
+```json
 {
     "id": 2,
     "name": "inbound-2",
@@ -269,70 +150,28 @@ Sample JSON for sending to /save:
     "configId": 1,
     "tag": "in-2"
 }
+```
+##### Description of /api/inbounds/save
+| Parameter  | Type   | Required | Description                                      |
+|------------|--------|----------|--------------------------------------------------|
+| `id`       | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
+| `name`     | string | No       | Inbound name                                     |
+| `enable`   | bool   | Yes      | Enable/disable status                            |
+| `listen`   | string | No       | IP address the inbound listens to               |
+| `port`     | uint   | Yes      | Port the inbound listens to                     |
+| `configId` | uint   | Yes      | ID of the config used                           |
+| `tag`      | string | Yes      | Inbound tag (must be unique)                    |
 
-Description of /api/inbounds/save
+* When retrieving an inbound, the associated clients will also be listed. [ClientInbound model](#client_inbounds-model). Config information is also visible.
 
+</details>
 
-
-Parameter
-Type
-Required
-Description
-
-
-
-id
-uint
-No
-If not provided, a new record is created; if provided, the specified record is edited
-
-
-name
-string
-No
-Inbound name
-
-
-enable
-bool
-Yes
-Enable/disable status
-
-
-listen
-string
-No
-IP address the inbound listens to
-
-
-port
-uint
-Yes
-Port the inbound listens to
-
-
-configId
-uint
-Yes
-ID of the config used
-
-
-tag
-string
-Yes
-Inbound tag (must be unique)
-
-
-
-When retrieving an inbound, the associated clients will also be listed. ClientInbound model. Config information is also visible.
-
-
-
-Clients Path Methods Guide
-
-  Click to view description
+### Clients Path Methods Guide
+<details>
+  <summary>Click to view description</summary>
 
 Defined model:
+```go
 type Client struct {
     Id     uint   `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
     Name   string `json:"name" form:"name" gorm:"unique"`
@@ -348,67 +187,23 @@ type Client struct {
     // inbounds part
     ClientInbounds []ClientInbound `gorm:"foreignKey:ClientId;references:Id" json:"inbounds"`
 }
+```
+**API methods:**
+Base: /api/clients
 
-API methods:Base: /api/clients
+| Method | Path                            | Action                                    | Request Body |
+|--------|---------------------------------|-------------------------------------------|--------------|
+| `GET`  | `"/"`                           | Get all clients                           | -            |
+| `GET`  | `"/get/:id"`                    | Get a client with client.id               | -            |
+| `POST` | `"/add"`                        | Add client(s)                             | [JSON](#description-apiclientsadd) |
+| `POST` | `"/update"`                     | Edit a client                             | [JSON](#description-apiclientsupdate) |
+| `POST` | `"/inbounds/:id"`               | Edit inbounds of a client with client.id  | [JSON](#description-apiclientsinbounds) |
+| `POST` | `"/del/:id"`                    | Delete a client                           | -            |
+| `POST` | `"/onlines"`                    | Get the list of last online users         | -            |
+| `GET`  | `"/traffics/:tag"`              | Get traffics (if enabled)                | -            |
 
-
-
-Method
-Path
-Action
-Request Body
-
-
-
-GET
-"/"
-Get all clients
--
-
-
-GET
-"/get/:id"
-Get a client with client.id
--
-
-
-POST
-"/add"
-Add client(s)
-JSON
-
-
-POST
-"/update"
-Edit a client
-JSON
-
-
-POST
-"/inbounds/:id"
-Edit inbounds of a client with client.id
-JSON
-
-
-POST
-"/del/:id"
-Delete a client
--
-
-
-POST
-"/onlines"
-Get the list of last online users
--
-
-
-GET
-"/traffics/:tag"
-Get traffics (if enabled)
--
-
-
-Sample JSON for sending to /add:
+##### Sample JSON for sending to /add:
+```json
 [
     {
         "name": "client1",
@@ -449,83 +244,27 @@ Sample JSON for sending to /add:
         ]
     }
 ]
+```
+##### Description of /api/clients/add
+| Parameter  | Type   | Required | Description                                      |
+|------------|--------|----------|--------------------------------------------------|
+| `name`     | string | Yes      | User name (must be unique)                       |
+| `enable`   | bool   | Yes      | Enable/disable status                            |
+| `quota`    | uint64 | No       | User's allowed data volume in bytes per period   |
+| `expiry`   | uint64 | No       | User expiration time in milliseconds (Unix epoch) |
+| `reset`    | uint   | No       | Days for resetting the quota per period         |
+| `once`     | uint   | No       | Days for the first period after initial connection |
+| `up`       | uint64 | No       | User's upload data in bytes                      |
+| `down`     | uint64 | No       | User's download data in bytes                    |
+| `remark`   | string | No       | Alias used in links                             |
+| `inbounds` | client_inbounds | No | Usable inbounds for the user                     |
 
-Description of /api/clients/add
+##### Sample JSON for sending to /update:
 
-
-
-Parameter
-Type
-Required
-Description
-
-
-
-name
-string
-Yes
-User name (must be unique)
-
-
-enable
-bool
-Yes
-Enable/disable status
-
-
-quota
-uint64
-No
-User's allowed data volume in bytes per period
-
-
-expiry
-uint64
-No
-User expiration time in milliseconds (Unix epoch)
-
-
-reset
-uint
-No
-Days for resetting the quota per period
-
-
-once
-uint
-No
-Days for the first period after initial connection
-
-
-up
-uint64
-No
-User's upload data in bytes
-
-
-down
-uint64
-No
-User's download data in bytes
-
-
-remark
-string
-No
-Alias used in links
-
-
-inbounds
-client_inbounds
-No
-Usable inbounds for the user
-
-
-Sample JSON for sending to /update:
 For updating a user, not all fields need to be sent (version 0.0.2 and above).
 
-Sample with all fields:
-
+* Sample with all fields:
+```json
 {
     "id": 1,
     "name": "Test1",
@@ -538,96 +277,39 @@ Sample with all fields:
     "down": 0,
     "remark": "theFirstTest"
 }
-
-
-Sample for resetting user traffic:
-
+```
+* Sample for resetting user traffic:
+```json
 {
     "id": 1,
     "up": 0,
     "down": 0
 }
-
-
-Sample for disabling a user:
-
+```
+* Sample for disabling a user:
+```json
 {
     "id": 1,
     "enable": false
 }
+```
 
-Description of /api/clients/update
+##### Description of /api/clients/update
+| Parameter  | Type   | Required | Description                                      |
+|------------|--------|----------|--------------------------------------------------|
+| `id`       | uint   | Yes      | Unique ID of the user to be edited               |
+| `name`     | string | No       | User name (must be unique)                       |
+| `enable`   | bool   | No       | Enable/disable status                            |
+| `quota`    | uint64 | No       | User's allowed data volume in bytes per period   |
+| `expiry`   | uint64 | No       | User expiration time in milliseconds (Unix epoch) |
+| `reset`    | uint   | No       | Days for resetting the quota per period         |
+| `once`     | uint   | No       | Days for the first period after initial connection |
+| `up`       | uint64 | No       | User's upload data in bytes                      |
+| `down`     | uint64 | No       | User's download data in bytes                    |
+| `remark`   | string | No       | Alias used in links                             |
 
-
-
-Parameter
-Type
-Required
-Description
-
-
-
-id
-uint
-Yes
-Unique ID of the user to be edited
-
-
-name
-string
-No
-User name (must be unique)
-
-
-enable
-bool
-No
-Enable/disable status
-
-
-quota
-uint64
-No
-User's allowed data volume in bytes per period
-
-
-expiry
-uint64
-No
-User expiration time in milliseconds (Unix epoch)
-
-
-reset
-uint
-No
-Days for resetting the quota per period
-
-
-once
-uint
-No
-Days for the first period after initial connection
-
-
-up
-uint64
-No
-User's upload data in bytes
-
-
-down
-uint64
-No
-User's download data in bytes
-
-
-remark
-string
-No
-Alias used in links
-
-
-Sample JSON for sending to /inbounds:
+##### Sample JSON for sending to /inbounds:
+```json
 [
     {
         "id": 38,
@@ -635,50 +317,31 @@ Sample JSON for sending to /inbounds:
         "config": "{\"id\": \"fbcad46d-c9ab-40a3-a3cc-5d1ccf9269b7\"\n}"
     }
 ]
+```
 
-Description of /api/clients/inbounds
+##### Description of /api/clients/inbounds
+| Parameter   | Type   | Required | Description                                      |
+|-------------|--------|----------|--------------------------------------------------|
+| `id`        | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
+| `inboundId` | uint   | Yes      | Inbound ID (inbound_id)                          |
+| `config`    | string | Yes      | User settings for this inbound                   |
 
+</details>
 
+### ClientInbounds Model
+<details>
+  <summary>Click to view description</summary>
 
-Parameter
-Type
-Required
-Description
-
-
-
-id
-uint
-No
-If not provided, a new record is created; if provided, the specified record is edited
-
-
-inboundId
-uint
-Yes
-Inbound ID (inbound_id)
-
-
-config
-string
-Yes
-User settings for this inbound
-
-
-
-
-ClientInbounds Model
-
-  Click to view description
-
+```go
 type ClientInbound struct {
     Id        uint   `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
     InboundId uint   `json:"inboundId" form:"inboundId"`
     ClientId  uint   `json:"clientId" form:"clientId"`
     Config    string `json:"config" form:"config"`
 }
-
-Sample JSON received in inbounds and clients:
+```
+##### Sample JSON received in inbounds and clients:
+```json
 [
     {
         "id": 38,
@@ -687,14 +350,15 @@ Sample JSON received in inbounds and clients:
         "config": "{\"id\": \"fbcad46d-c9ab-40a3-a3cc-5d1ccf9269b7\"\n}"
     }
 ]
+```
+</details>
 
-
-
-Outbounds Path Methods Guide
-
-  Click to view description
+### Outbounds Path Methods Guide
+<details>
+  <summary>Click to view description</summary>
 
 Defined model:
+```go
 type Outbound struct {
     Id             uint   `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
     SendThrough    string `json:"sendThrough" form:"sendThrough"`
@@ -705,49 +369,20 @@ type Outbound struct {
     ProxySettings  string `json:"proxySettings" form:"proxySettings"`
     Mux            string `json:"mux" form:"mux"`
 }
+```
+**API methods:**
+Base: /api/outbounds
 
-API methods:Base: /api/outbounds
+| Method | Path                            | Action                                    | Request Body |
+|--------|---------------------------------|-------------------------------------------|--------------|
+| `GET`  | `"/"`                           | Get all outbounds                         | -            |
+| `GET`  | `"/get/:id"`                    | Get an outbound with inbound.id           | -            |
+| `POST` | `"/save"`                       | Add/Edit an outbound                      | [JSON](#description-apioutboundssave)     |
+| `POST` | `"/del/:id"`                    | Delete an outbound                        | -            |
+| `GET`  | `"/traffics/:tag"`              | Get an outbound's traffics (if enabled)   | -            |
 
-
-
-Method
-Path
-Action
-Request Body
-
-
-
-GET
-"/"
-Get all outbounds
--
-
-
-GET
-"/get/:id"
-Get an outbound with inbound.id
--
-
-
-POST
-"/save"
-Add/Edit an outbound
-JSON
-
-
-POST
-"/del/:id"
-Delete an outbound
--
-
-
-GET
-"/traffics/:tag"
-Get an outbound's traffics (if enabled)
--
-
-
-Sample JSON for sending to /save:
+##### Sample JSON for sending to /save:
+```json
 {
     "id": 1,
     "sendThrough": "",
@@ -758,74 +393,29 @@ Sample JSON for sending to /save:
     "proxySettings": "",
     "mux": ""
 }
+```
+##### Description of /api/outbounds/save
+| Parameter       | Type   | Required | Description                                      |
+|-----------------|--------|----------|--------------------------------------------------|
+| `id`            | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
+| `sendThrough`   | string | No       | Server IP address for outgoing traffic           |
+| `protocol`      | string | Yes      | Outbound protocol                                |
+| `settings`      | string | No       | Settings                                        |
+| `tag`           | string | Yes      | Outbound tag (must be unique)                   |
+| `streamSettings`| string | No       | Stream settings                                 |
+| `proxySettings` | string | No       | Forward outbound to another outbound with tag    |
+| `mux`           | string | No       | Multiplexing settings                           |
 
-Description of /api/outbounds/save
+[More details](https://xtls.github.io/en/config/outbound.html)
 
+</details>
 
-
-Parameter
-Type
-Required
-Description
-
-
-
-id
-uint
-No
-If not provided, a new record is created; if provided, the specified record is edited
-
-
-sendThrough
-string
-No
-Server IP address for outgoing traffic
-
-
-protocol
-string
-Yes
-Outbound protocol
-
-
-settings
-string
-No
-Settings
-
-
-tag
-string
-Yes
-Outbound tag (must be unique)
-
-
-streamSettings
-string
-No
-Stream settings
-
-
-proxySettings
-string
-No
-Forward outbound to another outbound with tag
-
-
-mux
-string
-No
-Multiplexing settings
-
-
-More details
-
-
-Rules Path Methods Guide
-
-  Click to view description
+### Rules Path Methods Guide
+<details>
+  <summary>Click to view description</summary>
 
 Defined model:
+```go
 type Rule struct {
     Id            uint   `json:"id" form:"id" gorm:"primaryKey;autoIncrement"`
     DomainMatcher string `json:"domainMatcher" form:"domainMatcher"`
@@ -843,43 +433,19 @@ type Rule struct {
     OutboundTag   string `json:"outboundTag" form:"outboundTag"`
     BalancerTag   string `json:"balancerTag" form:"balancerTag"`
 }
+```
+**API methods:**
+Base: /api/rules
 
-API methods:Base: /api/rules
+| Method | Path                            | Action                                    | Request Body |
+|--------|---------------------------------|-------------------------------------------|--------------|
+| `GET`  | `"/"`                           | Get all rules                             | -            |
+| `GET`  | `"/get/:id"`                    | Get a rule with rule.id                   | -            |
+| `POST` | `"/save"`                       | Add/Edit a rule                           | [JSON](#description-apirulessave) |
+| `POST` | `"/del/:id"`                    | Delete a rule                             | -            |
 
-
-
-Method
-Path
-Action
-Request Body
-
-
-
-GET
-"/"
-Get all rules
--
-
-
-GET
-"/get/:id"
-Get a rule with rule.id
--
-
-
-POST
-"/save"
-Add/Edit a rule
-JSON
-
-
-POST
-"/del/:id"
-Delete a rule
--
-
-
-Sample JSON for sending to /save:
+##### Sample JSON for sending to /save:
+```json
 {
     "id": 1,
     "domainMatcher": "hybrid",
@@ -897,170 +463,51 @@ Sample JSON for sending to /save:
     "outboundTag": "direct",
     "balancerTag": "balancer"
 }
+```
+##### Description of /api/rules/save
+| Parameter       | Type   | Required | Description                                      |
+|-----------------|--------|----------|--------------------------------------------------|
+| `id`            | uint   | No       | If not provided, a new record is created; if provided, the specified record is edited |
+| `domainMatcher` | string | No       | Domain matching algorithm                       |
+| `domain`        | string | No       | Domains                                         |
+| `ip`            | string | No       | Destination IP addresses                        |
+| `port`          | string | No       | Destination ports                               |
+| `sourcePort`    | string | No       | Source port                                     |
+| `network`       | string | No       | Network used (tcp/udp)                          |
+| `source`        | string | No       | Source IP addresses                             |
+| `user`          | string | No       | Users                                           |
+| `inboundTag`    | string | No       | Inbound tags                                    |
+| `protocol`      | string | No       | Communication protocols                         |
+| `attrs`         | string | No       | Request header attributes                       |
+| `outboundTag`   | string | Yes      | Outbound tag                                    |
+| `balancerTag`   | string | No       | LoadBalancer tag                                |
 
-Description of /api/rules/save
+[More details](https://xtls.github.io/en/config/routing.html#ruleobject)
 
+</details>
 
-
-Parameter
-Type
-Required
-Description
-
-
-
-id
-uint
-No
-If not provided, a new record is created; if provided, the specified record is edited
-
-
-domainMatcher
-string
-No
-Domain matching algorithm
-
-
-domain
-string
-No
-Domains
-
-
-ip
-string
-No
-Destination IP addresses
-
-
-port
-string
-No
-Destination ports
-
-
-sourcePort
-string
-No
-Source port
-
-
-network
-string
-No
-Network used (tcp/udp)
-
-
-source
-string
-No
-Source IP addresses
-
-
-user
-string
-No
-Users
-
-
-inboundTag
-string
-No
-Inbound tags
-
-
-protocol
-string
-No
-Communication protocols
-
-
-attrs
-string
-No
-Request header attributes
-
-
-outboundTag
-string
-Yes
-Outbound tag
-
-
-balancerTag
-string
-No
-LoadBalancer tag
-
-
-More details
-
-
-Server Path Methods Guide
-
-  Click to view description
+### Server Path Methods Guide
+<details>
+  <summary>Click to view description</summary>
 
 This method is used to retrieve and send server information.
-API methods:Base: /api/server
 
+**API methods:**
+Base: /api/server
 
+| Method | Path                            | Action                                    | Request Body |
+|--------|---------------------------------|-------------------------------------------|--------------|
+| `POST` | `"/status"`                     | Get all statistics of server              | -            |
+| `POST` | `"/getXrayVersion"`             | Get xray-core version                     | -            |
+| `POST` | `"/setXrayVersion/:version"`    | Change the xray-core version              | -            |
+| `POST` | `"/stopXrayService"`            | Stop xray-core service                    | -            |
+| `POST` | `"/restartXrayService"`         | Restart xray-core service                 | -            |
+| `POST` | `"/getConfigJson"`              | Download the configuration of xray-core   | -            |
+| `POST` | `"/logs/:app/:count"`           | Get logs of services                      | -            |
+| `POST` | `"/getNewX25519Cert"`           | Get reality keys                          | -            |
 
-Method
-Path
-Action
-Request Body
-
-
-
-POST
-"/status"
-Get all statistics of server
--
-
-
-POST
-"/getXrayVersion"
-Get xray-core version
--
-
-
-POST
-"/setXrayVersion/:version"
-Change the xray-core version
--
-
-
-POST
-"/stopXrayService"
-Stop xray-core service
--
-
-
-POST
-"/restartXrayService"
-Restart xray-core service
--
-
-
-POST
-"/getConfigJson"
-Download the configuration of xray-core
--
-
-
-POST
-"/logs/:app/:count"
-Get logs of services
--
-
-
-POST
-"/getNewX25519Cert"
-Get reality keys
--
-
-
-Sample JSON received from /status:
+##### Sample JSON received from /status:
+```json
 {
     "cpu": 2.676659528908924,
     "cpuCount": 4,
@@ -1118,56 +565,29 @@ Sample JSON received from /status:
         "ipv6": ""
     }
 }
+```
 
+</details>
 
-
-Settings Path Methods Guide
-
-  Click to view description
+### Settings Path Methods Guide
+<details>
+  <summary>Click to view description</summary>
 
 This method is used to retrieve and send software settings.
-API methods:Base: /api/settings
 
+**API methods:**
+Base: /api/settings
 
+| Method | Path                            | Action                                    | Request Body |
+|--------|---------------------------------|-------------------------------------------|--------------|
+| `POST` | `"/getXrayDefault"`             | Get xray-core base configuration          | -            |
+| `POST` | `"/setXrayDefault"`             | Change xray-core base configuration       | JSON         |
+| `POST` | `"/getSettings"`                | Get App Configuration                     | -            |
+| `POST` | `"/setSettings"`                | Update App Configuration                  | [JSON](#description-apisettingssetsettings) |
+| `POST` | `"/restartApp"`                 | Restart Raha-Xray                         | -            |
 
-Method
-Path
-Action
-Request Body
-
-
-
-POST
-"/getXrayDefault"
-Get xray-core base configuration
--
-
-
-POST
-"/setXrayDefault"
-Change xray-core base configuration
-JSON
-
-
-POST
-"/getSettings"
-Get App Configuration
--
-
-
-POST
-"/setSettings"
-Update App Configuration
-JSON
-
-
-POST
-"/restartApp"
-Restart Raha-Xray
--
-
-
-Sample JSON for sending to /setXrayDefault:
+##### Sample JSON for sending to /setXrayDefault:
+```json
 {
   "log": {
     "loglevel": "warning",
@@ -1236,8 +656,10 @@ Sample JSON for sending to /setXrayDefault:
   },
   "stats": {}
 }
+```
 
-Sample JSON for sending to /setSettings:
+##### Sample JSON for sending to /setSettings:
+```json
 {
     "listen": "",
     "domain": "",
@@ -1250,75 +672,19 @@ Sample JSON for sending to /setSettings:
     "dbAddr": "root:rahaXray@tcp(localhost:3306)",
     "trafficDays": 30
 }
+```
+##### Description of /api/settings/setSettings
+| Parameter       | Type   | Required | Description                                      |
+|-----------------|--------|----------|--------------------------------------------------|
+| `listen`        | string | Yes      | IP address for the API service                   |
+| `domain`        | string | Yes      | API domain                                      |
+| `port`          | string | Yes      | API port                                        |
+| `certFile`      | string | Yes      | Path to the digital certificate file            |
+| `keyFile`       | string | Yes      | Path to the certificate key file                |
+| `basePath`      | string | Yes      | Default path (default: /api)                    |
+| `timeLocation`  | string | Yes      | Time zone                                       |
+| `dbType`        | string | Yes      | Database type (SQLite/MySQL)                    |
+| `dbAddr`        | string | Yes      | Database address                                |
+| `trafficDays`   | string | Yes      | Days to store usage data                        |
 
-Description of /api/settings/setSettings
-
-
-
-Parameter
-Type
-Required
-Description
-
-
-
-listen
-string
-Yes
-IP address for the API service
-
-
-domain
-string
-Yes
-API domain
-
-
-port
-string
-Yes
-API port
-
-
-certFile
-string
-Yes
-Path to the digital certificate file
-
-
-keyFile
-string
-Yes
-Path to the certificate key file
-
-
-basePath
-string
-Yes
-Default path (default: /api)
-
-
-timeLocation
-string
-Yes
-Time zone
-
-
-dbType
-string
-Yes
-Database type (SQLite/MySQL)
-
-
-dbAddr
-string
-Yes
-Database address
-
-
-trafficDays
-string
-Yes
-Days to store usage data
-
-
+</details>
